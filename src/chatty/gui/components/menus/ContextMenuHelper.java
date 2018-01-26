@@ -103,7 +103,7 @@ public class ContextMenuHelper {
                 if (q == null) {
                     m.addSeparator(streamlinkMenu);
                 } else {
-                    m.addItem("streamlinkQ"+q.qualities, q.displayName, streamlinkMenu);
+                    m.addItem("streamlinkQ  "+q.qualities, q.displayName, streamlinkMenu);
                 }
             }
         }

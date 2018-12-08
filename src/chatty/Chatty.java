@@ -63,7 +63,7 @@ public class Chatty {
      * Enable Version Checker (if you compile and distribute this yourself, you
      * may want to disable this)
      */
-    public static final boolean VERSION_CHECK_ENABLED = true;
+    public static final boolean VERSION_CHECK_ENABLED = false;
     
     /**
      * The regular URL of the textfile where the most recent version is stored.
@@ -74,6 +74,8 @@ public class Chatty {
      * For testing purposes.
      */
     public static final String VERSION_TEST_URL = "http://127.0.0.1/twitch/version.txt";
+    
+    public static final String COMPILE_INFO = "JDK10";
     
     /**
      * For use with the -single commandline argument, if no port is specified.

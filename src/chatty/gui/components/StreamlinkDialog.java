@@ -381,7 +381,7 @@ public class StreamlinkDialog extends JDialog {
                 parseQualities(message);
             }
             if (message.trim().startsWith("Starting player") && autoCloseDialog.isSelected()) {
-                LivestreamerDialog.this.setVisible(false);
+                StreamlinkDialog.this.setVisible(false);
             }
             
             Document doc = messages.getDocument();

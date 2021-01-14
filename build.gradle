@@ -30,14 +30,6 @@ sourceSets {
             srcDirs = ['src']
         }
     }
-    test {
-        java {
-            srcDirs = ['test']
-        }
-        resources {
-            srcDirs = ['test']
-        }
-    }
 }
 
 // Method that gets the version name from Chatty.java. It's defined after the sourceSets block because it uses its path

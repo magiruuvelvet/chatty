@@ -1,7 +1,6 @@
 
 package chatty.util.hotkeys;
 
-import com.tulskiy.keymaster.common.Provider;
 import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
@@ -17,20 +16,10 @@ public class GlobalHotkeySetter {
     private final GlobalHotkeySetter.GlobalHotkeyListener listener;
     
     private String error = "Global hotkey error";
-    private Provider hotkeys;
     private boolean anyRegistered;
     
     public GlobalHotkeySetter(GlobalHotkeySetter.GlobalHotkeyListener listener) {
         this.listener = listener;
-        try {
-            hotkeys = Provider.getCurrentProvider(true);
-            if (hotkeys == null) {
-                error = "Global hotkeys: Platform not supported";
-            }
-        } catch (Throwable ex) {
-            LOGGER.warning("Global hotkey error: "+ex);
-            error = "Global hotkey error: "+ex;
-        }
     }
     
     /**
@@ -51,7 +40,7 @@ public class GlobalHotkeySetter {
      * @return true if global hotkeys can be added, false otherwise
      */
     public boolean isActive() {
-        return hotkeys != null && hotkeys.isRunning();
+        return false;
     }
     
     /**
@@ -62,36 +51,12 @@ public class GlobalHotkeySetter {
      * depending on the system)
      */
     public void registerHotkey(Object hotkeyId, KeyStroke keyStroke) {
-        if (!isActive()) {
-            return;
-        }
-        try {
-            LOGGER.info("[Global Hotkeys] Trying to register hotkey: " + hotkeyId);
-            hotkeys.register(keyStroke, h -> {
-                listener.onHotkey(hotkeyId);
-            });
-            anyRegistered = true;
-        } catch (Throwable ex) {
-            // I don't think there can be an exception, but just in case
-            LOGGER.info("[Global Hotkeys] Error registering hotkey: " + ex);
-        }
     }
     
     /**
      * Removes all registered hotkeys.
      */
     public void unregisterAllHotkeys() {
-        if (!isActive() || !anyRegistered) {
-            return;
-        }
-        try {
-            hotkeys.reset();
-            anyRegistered = false;
-        }
-        catch (Throwable ex) {
-            // I don't think there can be an exception, but just in case
-            LOGGER.warning("[Global Hotkeys] Error resetting: " + ex);
-        }
     }
     
     /**
@@ -99,16 +64,6 @@ public class GlobalHotkeySetter {
      * afterwards.
      */
     public void cleanUp() {
-        if (!isActive()) {
-            return;
-        }
-        try {
-            hotkeys.close();
-        }
-        catch (Throwable ex) {
-            // I don't think there can be an exception, but just in case
-            LOGGER.warning("[Global Hotkeys] Error closing: " + ex);
-        }
     }
     
     public interface GlobalHotkeyListener {

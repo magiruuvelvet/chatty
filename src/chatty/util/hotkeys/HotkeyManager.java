@@ -63,7 +63,7 @@ public class HotkeyManager {
     /**
      * Whether global hotkeys are currently to be enabled (registered).
      */
-    private boolean globalHotkeysRegister = true;
+    private boolean globalHotkeysRegister = false;
     
     /**
      * Whether global hotkeys are currently enabled as per setting. They may
@@ -101,29 +101,7 @@ public class HotkeyManager {
      * hotkey is actually configured and enabled.
      */
     private void initGlobalHotkeys() {
-        if (Chatty.HOTKEY && !attemptedToInitGlobalHotkeys) {
-            // Try to init only once
-            attemptedToInitGlobalHotkeys = true;
-            try {
-                globalHotkeys = new GlobalHotkeySetter(new GlobalHotkeySetter.GlobalHotkeyListener() {
-
-                    @Override
-                    public void onHotkey(Object hotkeyId) {
-                        onGlobalHotkey(hotkeyId);
-                    }
-                });
-                // If an error occured during initialization, then set to null
-                // which means it's not going to be used.
-                if (!globalHotkeys.isActive()) {
-                    globalHotkeyErrorWarning = globalHotkeys.getError();
-                    globalHotkeys = null;
-                }
-            } catch (NoClassDefFoundError ex) {
-                LOGGER.warning("Failed to initialize hotkey setter [" + ex + "]");
-                globalHotkeyErrorWarning = "Failed to initialize global hotkeys (library not found).";
-                globalHotkeys = null;
-            }
-        }
+        globalHotkeys = null;
     }
     
     public void setSettings(Settings settings) {

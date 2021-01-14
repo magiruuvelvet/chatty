@@ -1,3 +1,16 @@
+**`native-image` branch**
+
+An attempt to compile Chatty into a fully native app. Currently only a fallback image
+can be created which still depends on the GraalVM JVM, but the performance is already
+stunning and Chatty became super fast.
+
+Tests on my computer:
+
+ - `OracleJDK / OpenJDK / Zulu Java / Jetbrains Runtime`: 20 seconds startup, 5 seconds until connection dialog appears, 2 seconds until chat becomes responsive (27 seconds total before I can use Chatty)
+ - `GraalVM JVM`: 15 seconds startup, 4 seconds until connection dialog appears, 2 seconds until chat becomes responsive (21 second total before I can use Chatty)
+ - `GraalVM JVM + Native Fallback Image`: 3 seconds startup, instant connection dialog, instant chat responsive (3 seconds total before I can use Chatty)
+ - `Native Image`: ??? (doesn't compile yet due to reflection use and some other offenders)
+
 Chatty
 ======
 

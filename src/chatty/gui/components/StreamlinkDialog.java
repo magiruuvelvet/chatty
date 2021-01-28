@@ -177,8 +177,6 @@ public class StreamlinkDialog extends JDialog {
                 } else if (e.getSource() == enableContextMenu) {
                     // Only save setting, loading is done from the MainGui
                     settings.setBoolean("streamlink", enableContextMenu.isSelected());
-                } else if (e.getSource() == useAuth) {
-                    settings.setBoolean("streamlinkUseAuth", useAuth.isSelected());
                 } else if (e.getSource() == openDialog) {
                     settings.setBoolean("streamlinkShowDialog", openDialog.isSelected());
                 } else if (e.getSource() == autoCloseDialog) {
@@ -275,7 +273,6 @@ public class StreamlinkDialog extends JDialog {
         enableContextMenu.setSelected(settings.getBoolean("streamlink"));
         this.qualities.setSettingValue(settings.getString("streamlinkQualities"));
         commandDef.setSettingValue(settings.getString("streamlinkCommand"));
-        useAuth.setSelected(settings.getBoolean("streamlinkUseAuth"));
         openDialog.setSelected(settings.getBoolean("streamlinkShowDialog"));
         autoCloseDialog.setSelected(settings.getBoolean("streamlinkAutoCloseDialog"));
     }
@@ -434,11 +431,6 @@ public class StreamlinkDialog extends JDialog {
             }
             StringBuilder command = new StringBuilder();
             command.append(makeBaseCommand());
-            if (url.contains("twitch.tv") && settings.getBoolean("streamlinkUseAuth")
-                    && !settings.getString("token").isEmpty()) {
-                command.append(" --twitch-oauth-token ");
-                command.append(settings.getString("token"));
-            }
             command.append(" ");
             command.append(url);
             if (quality != null) {

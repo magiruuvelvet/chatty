@@ -131,12 +131,26 @@ public class MessageSettings extends SettingsPanel {
     
     public static JPanel createTimestampPanel(SettingsDialog d, String setting) {
         final Map<String,String> timestampOptions = new LinkedHashMap<>();
-        timestampOptions.put("off", "Off");
-        timestampOptions.put("", "Empty (Space)");
-        addTimestampFormat(timestampOptions, "[HH:mm:ss]");
-        addTimestampFormat(timestampOptions, "[HH:mm]");
-        addTimestampFormat(timestampOptions, "HH:mm:ss");
-        addTimestampFormat(timestampOptions, "HH:mm");
+        List<String> dateFormats = Arrays.asList(new String[]{"","YYYY-MM-dd ",
+            "MMM d ", "d MMM ", "dd.MM. "});
+        for (String dateFormat : dateFormats) {
+            timestampOptions.put("off", "Off");
+            timestampOptions.put("", "Empty (Space)");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "HH:mm:ss]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "HH:mm]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "hh:mm:ss a]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "hh:mm a]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "h:mm a]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "hh:mm:ssa]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "hh:mma]");
+            addTimestampFormat(timestampOptions, "[" + dateFormat + "h:mma]");
+        }
+        addTimestampFormat(timestampOptions, "[HH時mm分]");
+        addTimestampFormat(timestampOptions, "[HH時mm分ss秒]");
+        addTimestampFormat(timestampOptions, "[yyyy年MM月dd日HH時mm分]");
+        addTimestampFormat(timestampOptions, "[yyyy年MM月dd日HH時mm分ss秒]");
+        addTimestampFormat(timestampOptions, "[yyyy年MM月dd日 HH時mm分]");
+        addTimestampFormat(timestampOptions, "[yyyy年MM月dd日 HH時mm分ss秒]");
         ComboStringSetting combo = new ComboStringSetting(timestampOptions);
         combo.setEditable(false);
         d.addStringSetting(setting, combo);

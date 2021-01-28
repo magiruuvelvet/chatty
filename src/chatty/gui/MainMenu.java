@@ -168,7 +168,7 @@ public class MainMenu extends JMenuBar {
         //-------
         // Extra
         //-------
-        addItem(extra,"dialog.livestreamer");
+        addItem(extra,"dialog.streamlink",Language.getString("menubar.dialog.streamlink"), KeyEvent.VK_L);
         addItem(extra,"dialog.toggleEmotes");
         extra.addSeparator();
         addItem(extra,"dialog.followers");

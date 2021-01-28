@@ -5,9 +5,9 @@ import chatty.Helper;
 import chatty.gui.GuiUtil;
 import chatty.gui.components.settings.EditorStringSetting;
 import chatty.util.Debugging;
-import chatty.util.Livestreamer;
-import chatty.util.Livestreamer.LivestreamerListener;
-import static chatty.util.Livestreamer.filterToken;
+import chatty.util.Streamlink;
+import chatty.util.Streamlink.StreamlinkListener;
+import static chatty.util.Streamlink.filterToken;
 import chatty.util.StringUtil;
 import chatty.util.settings.Settings;
 import java.awt.BorderLayout;
@@ -38,13 +38,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 /**
- * Contains settings and information about Livestreamer and the tabs that are
+ * Contains settings and information about Streamlink and the tabs that are
  * created when you open a stream, that show output and have have controls to
- * select quality or stop/re-run the Livestreamer process.
+ * select quality or stop/re-run the Streamlink process.
  * 
  * @author tduva
  */
-public class LivestreamerDialog extends JDialog {
+public class StreamlinkDialog extends JDialog {
     
     private final JButton closeButton = new JButton("Close");
     private final JTabbedPane tabs = new JTabbedPane();
@@ -60,10 +60,10 @@ public class LivestreamerDialog extends JDialog {
     private final JTextField streamInput = new JTextField(30);
     private final JButton openStreamButton = new JButton("Open Stream");
     
-    private static final String INFO = "Streamlink (a fork of Livestreamer) is an external program "
-            + "you have to install separately that allows you to watch "
+    private static final String INFO = "Streamlink is an external program "
+            + "you have to install seperately that allows you to watch "
             + "streams of many websites in a player like VLC. "
-            + "[help-livestreamer:top More information..]";
+            + "[help-streamlink:top More information..]";
     
     private static final String BASE_COMMAND_INFO = "<html><body style='width:340px;font-weight:normal;'>"
             + "Example Usage (setting the window title for VLC):<br />"
@@ -79,7 +79,7 @@ public class LivestreamerDialog extends JDialog {
     
     private final Settings settings;
     
-    public LivestreamerDialog(Window parent, LinkLabelListener linkLabelListener,
+    public StreamlinkDialog(Window parent, LinkLabelListener linkLabelListener,
             final Settings settings) {
         super(parent);
         this.settings = settings;
@@ -176,11 +176,13 @@ public class LivestreamerDialog extends JDialog {
                     }
                 } else if (e.getSource() == enableContextMenu) {
                     // Only save setting, loading is done from the MainGui
-                    settings.setBoolean("livestreamer", enableContextMenu.isSelected());
+                    settings.setBoolean("streamlink", enableContextMenu.isSelected());
+                } else if (e.getSource() == useAuth) {
+                    settings.setBoolean("streamlinkUseAuth", useAuth.isSelected());
                 } else if (e.getSource() == openDialog) {
-                    settings.setBoolean("livestreamerShowDialog", openDialog.isSelected());
+                    settings.setBoolean("streamlinkShowDialog", openDialog.isSelected());
                 } else if (e.getSource() == autoCloseDialog) {
-                    settings.setBoolean("livestreamerAutoCloseDialog", autoCloseDialog.isSelected());
+                    settings.setBoolean("streamlinkAutoCloseDialog", autoCloseDialog.isSelected());
                 }
             }
         };
@@ -196,7 +198,7 @@ public class LivestreamerDialog extends JDialog {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                settings.setString("livestreamerCommand", commandDef.getSettingValue());
+                settings.setString("streamlinkCommand", commandDef.getSettingValue());
             }
         });
         
@@ -270,11 +272,12 @@ public class LivestreamerDialog extends JDialog {
     }
     
     private void loadSettings() {
-        enableContextMenu.setSelected(settings.getBoolean("livestreamer"));
-        this.qualities.setSettingValue(settings.getString("livestreamerQualities"));
-        commandDef.setSettingValue(settings.getString("livestreamerCommand"));
-        openDialog.setSelected(settings.getBoolean("livestreamerShowDialog"));
-        autoCloseDialog.setSelected(settings.getBoolean("livestreamerAutoCloseDialog"));
+        enableContextMenu.setSelected(settings.getBoolean("streamlink"));
+        this.qualities.setSettingValue(settings.getString("streamlinkQualities"));
+        commandDef.setSettingValue(settings.getString("streamlinkCommand"));
+        useAuth.setSelected(settings.getBoolean("streamlinkUseAuth"));
+        openDialog.setSelected(settings.getBoolean("streamlinkShowDialog"));
+        autoCloseDialog.setSelected(settings.getBoolean("streamlinkAutoCloseDialog"));
     }
     
     /**
@@ -283,7 +286,7 @@ public class LivestreamerDialog extends JDialog {
      * first). Listens to the responses of the process and shows them in the GUI
      * and has buttons to control it.
      */
-    private class Item extends JPanel implements LivestreamerListener,
+    private class Item extends JPanel implements StreamlinkListener,
             ActionListener {
         
         private final JButton closeButton = new JButton("Close");
@@ -305,9 +308,9 @@ public class LivestreamerDialog extends JDialog {
         private boolean running;
         
         /**
-         * Reference to the current Livestreamer object.
+         * Reference to the current Streamlink object.
          */
-        private Livestreamer ls;
+        private Streamlink ls;
         private final ActionListener qualityButtonListener = new QualityButtonListener();
         
         private final JPanel buttonPanel = new JPanel();
@@ -382,12 +385,12 @@ public class LivestreamerDialog extends JDialog {
             try {
                 doc.insertString(doc.getLength(), filterToken(message)+"\n", null);
             } catch (BadLocationException ex) {
-                Logger.getLogger(LivestreamerDialog.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(StreamlinkDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
         /**
-         * Parses the output of Livestreamer that lists the available qualities
+         * Parses the output of Streamlink that lists the available qualities
          * and adds a button for each quality. This may not be very robust
          * parsing if the format changes.
          * 
@@ -431,19 +434,24 @@ public class LivestreamerDialog extends JDialog {
             }
             StringBuilder command = new StringBuilder();
             command.append(makeBaseCommand());
+            if (url.contains("twitch.tv") && settings.getBoolean("streamlinkUseAuth")
+                    && !settings.getString("token").isEmpty()) {
+                command.append(" --twitch-oauth-token ");
+                command.append(settings.getString("token"));
+            }
             command.append(" ");
             command.append(url);
             if (quality != null) {
                 command.append(" ");
                 command.append(quality);
             }
-            Livestreamer ls = new Livestreamer(command.toString(), this);
+            Streamlink ls = new Streamlink(command.toString(), this);
             this.ls = ls;
             ls.start();
         }
         
         private String makeBaseCommand() {
-            String command = settings.getString("livestreamerCommand");
+            String command = settings.getString("streamlinkCommand");
             command = command.replace("$stream", stream);
             command = command.replace("$url", url);
             if (quality != null) {
@@ -470,7 +478,7 @@ public class LivestreamerDialog extends JDialog {
             // Remove the tab only when the quality was already set, which means
             // it should have been the final run, and the dialog isn't open,
             // so the user probably doesn't need it anymore.
-            if (!running && quality != null && !LivestreamerDialog.this.isVisible()) {
+            if (!running && quality != null && !StreamlinkDialog.this.isVisible()) {
                 tabs.remove(this);
             }
         }

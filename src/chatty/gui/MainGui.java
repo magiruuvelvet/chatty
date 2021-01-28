@@ -48,7 +48,7 @@ import chatty.gui.components.ErrorMessage;
 import chatty.gui.components.eventlog.EventLog;
 import chatty.gui.components.FollowersDialog;
 import chatty.gui.components.LiveStreamsDialog;
-import chatty.gui.components.LivestreamerDialog;
+import chatty.gui.components.StreamlinkDialog;
 import chatty.gui.components.ModerationLog;
 import chatty.gui.components.srl.SRL;
 import chatty.gui.components.SearchDialog;
@@ -161,7 +161,7 @@ public class MainGui extends JFrame implements Runnable {
     private ErrorMessage errorMessage;
     private AddressbookDialog addressbookDialog;
     private SRL srl;
-    private LivestreamerDialog livestreamerDialog;
+    private StreamlinkDialog streamlinkDialog;
     private UpdateDialog updateDialog;
     //private NewsDialog newsDialog;
     private EmotesDialog emotesDialog;
@@ -303,7 +303,7 @@ public class MainGui extends JFrame implements Runnable {
         // Some newer stuff
         addressbookDialog = new AddressbookDialog(this, client.addressbook);
         srl = new SRL(this, client.speedrunsLive, contextMenuListener);
-        livestreamerDialog = new LivestreamerDialog(this, linkLabelListener, client.settings);
+        streamlinkDialog = new StreamlinkDialog(this, linkLabelListener, client.settings);
         updateDialog = new UpdateDialog(this, linkLabelListener, client.settings,() -> exit());
         //newsDialog = new NewsDialog(this, client.settings);
         
@@ -1241,8 +1241,8 @@ public class MainGui extends JFrame implements Runnable {
         CommandMenuItems.setCommands(CommandMenuItems.MenuType.TEXT, client.settings.getString("textContextMenu"));
         CommandMenuItems.setCommands(CommandMenuItems.MenuType.ADMIN, client.settings.getString("adminContextMenu"));
         TextSelectionMenu.update();
-        ContextMenuHelper.livestreamerQualities = client.settings.getString("livestreamerQualities");
-        ContextMenuHelper.enableLivestreamer = client.settings.getBoolean("livestreamer");
+        ContextMenuHelper.streamlinkQualities = client.settings.getString("streamlinkQualities");
+        ContextMenuHelper.enableStreamlink = client.settings.getBoolean("streamlink");
         ContextMenuHelper.settings = client.settings;
     }
     
@@ -1717,8 +1717,8 @@ public class MainGui extends JFrame implements Runnable {
                 case "help-admin":
                     openHelp("help-admin.html", ref);
                     break;
-                case "help-livestreamer":
-                    openHelp("help-livestreamer.html", ref);
+                case "help-streamlink":
+                    openHelp("help-streamlink.html", ref);
                     break;
                 case "help-whisper":
                     openHelp("help-whisper.html", ref);
@@ -1878,6 +1878,8 @@ public class MainGui extends JFrame implements Runnable {
                 if (!stream.isEmpty()) {
                     srl.searchRaceWithEntrant(stream);
                 }
+            } else if (cmd.equals("streamlink")) {
+                streamlinkDialog.open(null, null);
             } else if (cmd.equals("configureLogin")) {
                 openTokenDialog();
             } else if (cmd.equals("addStreamHighlight")) {
@@ -2282,7 +2284,7 @@ public class MainGui extends JFrame implements Runnable {
          * parameter.
          */
         private final Set<String> streamCmdsPrefix = new HashSet<>(
-                Arrays.asList("stream", "livestreamer"));
+                Arrays.asList("stream", "streamlink"));
         
         /**
          * Check if this command requires at least one stream/channel parameter.
@@ -2408,17 +2410,17 @@ public class MainGui extends JFrame implements Runnable {
                         break;
                 }
                 TwitchUrl.openMultitwitch(streams2, getActiveWindow(), type);
-            } else if (cmd.startsWith("livestreamer")) {
+            } else if (cmd.startsWith("streamlink")) {
                 // quality null means select
                 String quality = null;
-                if (cmd.startsWith("livestreamerQ")) {
+                if (cmd.startsWith("streamlinkQ")) {
                     quality = StringUtil.toLowerCase(cmd.substring(13));
                     if (quality.equalsIgnoreCase("select")) {
                         quality = null;
                     }
                 }
                 for (String stream : streams) {
-                    livestreamerDialog.open(StringUtil.toLowerCase(stream), quality);
+                    streamlinkDialog.open(StringUtil.toLowerCase(stream), quality);
                 }
             } else if (cmd.equals("showChannelEmotes")) {
                 if (firstStream != null) {
@@ -2868,7 +2870,7 @@ public class MainGui extends JFrame implements Runnable {
             UserMessage m = new UserMessage(client.getSpecialUser(), message, null, null, 0, null, null, null, MsgTags.EMPTY);
             streamChat.printMessage(m);
         });
-        client.commands.addEdt("livestreamer", p -> {
+        client.commands.addEdt("streamlink", p -> {
             String stream = null;
             String quality = null;
             String parameter = StringUtil.trim(p.getArgs());
@@ -2887,7 +2889,7 @@ public class MainGui extends JFrame implements Runnable {
                 }
             }
             printLine("Streamlink: Opening stream..");
-            livestreamerDialog.open(stream, quality);
+            streamlinkDialog.open(stream, quality);
         });
         client.commands.addEdt("help", p -> {
             openHelp(null);
@@ -5418,8 +5420,8 @@ public class MainGui extends JFrame implements Runnable {
                     updateHighlightIncludeAllMatches();
                 } else if (setting.equals("popoutSaveAttributes") || setting.equals("popoutCloseLastChannel")) {
                     updatePopoutSettings();
-                } else if (setting.equals("livestreamer")) {
-                    ContextMenuHelper.enableLivestreamer = (Boolean)value;
+                } else if (setting.equals("streamlink")) {
+                    ContextMenuHelper.enableStreamlink = (Boolean)value;
                 } else if (setting.equals("attachedWindows")) {
                     windowStateManager.setAttachedWindowsEnabled((Boolean)value);
                 } else if (setting.equals("globalHotkeysEnabled")) {
@@ -5553,7 +5555,7 @@ public class MainGui extends JFrame implements Runnable {
             }
             if (setting.equals("channelContextMenu")
                     || setting.equals("userContextMenu")
-                    || setting.equals("livestreamerQualities")
+                    || setting.equals("streamlinkQualities")
                     || setting.equals("streamsContextMenu")
                     || setting.equals("textContextMenu")
                     || setting.equals("adminContextMenu")) {

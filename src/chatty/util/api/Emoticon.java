@@ -288,7 +288,7 @@ public class Emoticon {
     }
     
     public static ImageType makeImageType(boolean animated) {
-        return animated ? ImageType.ANIMATED_DARK : ImageType.STATIC;
+        return animated ? ImageType.ANIMATED_LIGHT : ImageType.STATIC;
     }
     
     public static String getTwitchEmoteUrlById(String id, int factor, ImageType imageType) {

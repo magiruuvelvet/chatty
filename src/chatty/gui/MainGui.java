@@ -644,15 +644,15 @@ public class MainGui extends JFrame implements Runnable {
             }
         });
         
-        addMenuAction("dialog.livestreamer", "Dialog: "+Language.getString("menubar.dialog.livestreamer")+" (toggle)", KeyEvent.VK_L, new AbstractAction() {
+        addMenuAction("dialog.streamlink", "Dialog: "+Language.getString("menubar.dialog.streamlink")+" (toggle)", KeyEvent.VK_L, new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (livestreamerDialog.isVisible()) {
-                    livestreamerDialog.close();
+                if (streamlinkDialog.isVisible()) {
+                    streamlinkDialog.close();
                 }
                 else {
-                    livestreamerDialog.open(null, null);
+                    streamlinkDialog.open(null, null);
                 }
             }
         });

@@ -244,7 +244,7 @@ public class StreamlinkDialog extends JDialog {
     
     public void close() {
         dispose();
-        settings.setString("livestreamerQualities", qualities.getSettingValue());
+        settings.setString("streamlinkQualities", qualities.getSettingValue());
     }
     
     /**
